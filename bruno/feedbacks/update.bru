@@ -1,0 +1,27 @@
+meta {
+  name: update
+  type: http
+  seq: 2
+}
+
+patch {
+  url: http://localhost/api/feedbacks/1ef754bf-8942-647e-8cb0-b792eb7a3d51
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{JWT}}
+}
+
+body:json {
+  {
+    "status": "inProgress"
+  }
+}
+
+body:multipart-form {
+  file: @file(/Users/herveguigoz/Documents/Work/theTribe/avatar.png)
+  body: TESTqqq
+  canvas: 1ef7513a-624d-6338-bf6c-ad17a0fb5482
+}

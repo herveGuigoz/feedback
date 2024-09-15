@@ -1,0 +1,21 @@
+meta {
+  name: item
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost/api/projects/{{PROJECT}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{JWT}}
+}
+
+script:post-response {
+  if (res.status === 200) {
+    bru.setEnvVar('CANVAS', res.body.canvases[0].id);
+  }
+}

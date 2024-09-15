@@ -1,0 +1,15 @@
+meta {
+  name: item
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost/api/projects/{{PROJECT}}/canvases/{{CANVAS}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{JWT}}
+}

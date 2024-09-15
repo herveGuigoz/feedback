@@ -1,0 +1,21 @@
+meta {
+  name: collection
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost/api/projects
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{JWT}}
+}
+
+script:post-response {
+  if (res.status === 200) {
+    bru.setEnvVar('PROJECT', res.body[0].id);
+  }
+}
