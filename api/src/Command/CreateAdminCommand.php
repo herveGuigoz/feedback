@@ -33,6 +33,14 @@ class CreateAdminCommand extends Command
             return $email;
         });
 
+        $username = $io->ask('username', null, function ($username) {
+            if (null === $username) {
+                throw new \RuntimeException('The username is invalid');
+            }
+
+            return $username;
+        });
+
         $password = $io->askHidden('password', function ($password) {
             if (null === $password) {
                 throw new \RuntimeException('The password is invalid');
@@ -41,7 +49,7 @@ class CreateAdminCommand extends Command
             return $password;
         });
 
-        $this->createAdminService->create($email, $password);
+        $this->createAdminService->create($email, $username, $password);
 
         $io->success('Successfully created admin user.');
 

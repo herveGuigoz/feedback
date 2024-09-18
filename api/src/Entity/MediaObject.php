@@ -67,7 +67,7 @@ class MediaObject
     public ?string $contentUrl = null;
 
     #[ORM\OneToOne(mappedBy: 'image', cascade: ['persist', 'remove'])]
-    private ?Feedback $feedback = null;
+    private ?Issue $issue = null;
 
     public function getId(): ?int
     {
@@ -106,24 +106,24 @@ class MediaObject
         return $this;
     }
 
-    public function getFeedback(): ?Feedback
+    public function getIssue(): ?Issue
     {
-        return $this->feedback;
+        return $this->issue;
     }
 
-    public function setFeedback(?Feedback $feedback): static
+    public function setIssue(?Issue $issue): static
     {
         // unset the owning side of the relation if necessary
-        if ($feedback === null && $this->feedback !== null) {
-            $this->feedback->setImage(null);
+        if ($issue === null && $this->issue !== null) {
+            $this->issue->setImage(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($feedback !== null && $feedback->getImage() !== $this) {
-            $feedback->setImage($this);
+        if ($issue !== null && $issue->getImage() !== $this) {
+            $issue->setImage($this);
         }
 
-        $this->feedback = $feedback;
+        $this->issue = $issue;
 
         return $this;
     }

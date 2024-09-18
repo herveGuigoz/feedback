@@ -13,14 +13,14 @@ class CreateAdminService
         private readonly UserPasswordHasherInterface $passwordHasher
     ) {}
 
-    public function create(string $email, string $password): User
+    public function create(string $email, string $username, string $password): User
     {
         $user = $this->userRepository->findOneBy(['email' => $email]);
 
         if (!$user) {
             $user = new User();
             $user->setEmail($email);
-
+            $user->setUsername($username);
             $password = $this->passwordHasher->hashPassword($user, $password);
             $user->setPassword($password);
         }

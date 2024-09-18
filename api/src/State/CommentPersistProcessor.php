@@ -19,7 +19,7 @@ class CommentPersistProcessor implements ProcessorInterface
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Comment
-    {
+    {   
         if ($operation instanceof Post) {
             $data->setAuthor($this->security->getUser());
             $data->setPublishedAt(new \DateTimeImmutable());

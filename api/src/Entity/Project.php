@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -34,6 +35,12 @@ use Symfony\Component\Validator\Constraints as Assert;
                 AbstractNormalizer::GROUPS => ['read', 'project:read'],
             ],
         ),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+            denormalizationContext: [
+                AbstractNormalizer::GROUPS => ['project:write'],
+            ],
+        ),
     ],
 )]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
@@ -47,30 +54,30 @@ class Project
     #[ORM\Id]
     private ?Uuid $id = null;
 
-    #[Groups(['read'])]
+    #[Groups(['read', 'project:write'])]
     #[Assert\NotBlank(allowNull: false)]
     #[ORM\Column(type: Types::STRING, length: 255)]
     private ?string $name = null;
 
-    #[Groups(['read'])]
+    #[Groups(['read', 'project:write'])]
     #[Assert\Url(protocols: ['http', 'https'])]
     #[ORM\Column(type: Types::STRING, length: 255)]
     private ?string $url = null;
 
+    #[Groups(['project:write'])]
     #[ORM\ManyToOne(inversedBy: 'projects')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
     /**
-     * @var Collection<int, Canvas>
+     * @var Collection<int, Issue>
      */
-    #[Groups(['project:read'])]
-    #[ORM\OneToMany(targetEntity: Canvas::class, mappedBy: 'project', orphanRemoval: true)]
-    private Collection $canvases;
+    #[ORM\OneToMany(targetEntity: Issue::class, mappedBy: 'project', orphanRemoval: true)]
+    private Collection $issues;
 
     public function __construct()
     {
-        $this->canvases = new ArrayCollection();
+        $this->issues = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -115,29 +122,29 @@ class Project
     }
 
     /**
-     * @return Collection<int, Canvas>
+     * @return Collection<int, Issue>
      */
-    public function getCanvases(): Collection
+    public function getIssues(): Collection
     {
-        return $this->canvases;
+        return $this->issues;
     }
 
-    public function addCanvas(Canvas $canvas): static
+    public function addIssue(Issue $issue): static
     {
-        if (!$this->canvases->contains($canvas)) {
-            $this->canvases->add($canvas);
-            $canvas->setProject($this);
+        if (!$this->issues->contains($issue)) {
+            $this->issues->add($issue);
+            $issue->setProject($this);
         }
 
         return $this;
     }
 
-    public function removeCanvas(Canvas $canvas): static
+    public function removeIssue(Issue $issue): static
     {
-        if ($this->canvases->removeElement($canvas)) {
+        if ($this->issues->removeElement($issue)) {
             // set the owning side to null (unless already changed)
-            if ($canvas->getProject() === $this) {
-                $canvas->setProject(null);
+            if ($issue->getProject() === $this) {
+                $issue->setProject(null);
             }
         }
 

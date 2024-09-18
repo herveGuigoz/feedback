@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Repository\CommentRepository;
 use App\State\CommentPersistProcessor;
@@ -19,19 +21,24 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     outputFormats: ['json' => ['application/json']],
-    security: "is_granted('ROLE_USER')",
     operations: [
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN')",
+        ),
         new Post(
+            security: "is_granted('ROLE_USER')",
             processor: CommentPersistProcessor::class,
-            normalizationContext: [
-                AbstractNormalizer::GROUPS => ['read', 'comment:read'],
-            ],
-            denormalizationContext: [
-                AbstractNormalizer::GROUPS => ['comment:write'],
-            ],
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN') or object.getAuthor() == user",
         ),
     ],
-    
+    normalizationContext: [
+        AbstractNormalizer::GROUPS => ['read', 'comment:read'],
+    ],
+    denormalizationContext: [
+        AbstractNormalizer::GROUPS => ['comment:write'],
+    ],
 )]
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
@@ -57,7 +64,7 @@ class Comment
     #[Assert\NotNull]
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Feedback $feedback = null;
+    private ?Issue $issue = null;
     
     #[Groups(groups: ['read', 'comment:read'])]
     #[ORM\Column]
@@ -97,14 +104,14 @@ class Comment
         return $this;
     }
 
-    public function getFeedback(): ?Feedback
+    public function getIssue(): ?Issue
     {
-        return $this->feedback;
+        return $this->issue;
     }
 
-    public function setFeedback(?Feedback $feedback): static
+    public function setIssue(?Issue $issue): static
     {
-        $this->feedback = $feedback;
+        $this->issue = $issue;
 
         return $this;
     }

@@ -2,8 +2,8 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Canvas;
 use App\Entity\Feedback;
+use App\Entity\Issue;
 use App\Entity\Project;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -50,7 +50,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Users', 'fas fa-user-friends', User::class);
         yield MenuItem::linkToCrud('Projects', 'fas fa-list', Project::class);
-        yield MenuItem::linkToCrud('Canvases', 'fas fa-list', Canvas::class);
-        yield MenuItem::linkToCrud('Feedback', 'fas fa-list-check', Feedback::class);
+        yield MenuItem::linkToCrud('Issues', 'fas fa-list-check', Issue::class);
     }
 }
