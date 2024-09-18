@@ -31,6 +31,7 @@ class IssuePersistProcessor implements ProcessorInterface
             $request = $context['request'];
             $data->setOwner($this->security->getUser());
             $data->setImage($this->handleFileUpload($request));
+            $data->setUrl(\urldecode($data->getUrl()));
             $data->setStatus(Status::PENDING);
             $data->setCreatedAt(new \DateTimeImmutable());
         }

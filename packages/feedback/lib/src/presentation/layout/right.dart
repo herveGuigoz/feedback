@@ -26,10 +26,9 @@ class _RightPaneState extends State<RightPane> {
     final image = await boundary.toImage(pixelRatio: pixelRatio);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     final pngBytes = byteData!.buffer.asUint8List();
-
-    // TODO: add screenshot to the feedback bloc
-    log('Screenshot taken: ${_childSize.width}x${_childSize.height}');
-    // controller.screenshot = Screenshot(image: pngBytes, size: _childSize);
+    log('Screenshot taken', name: 'RightPane');
+    // ignore: use_build_context_synchronously
+    context.read<EventBus>().add(ScreenshotEvent(image: pngBytes, screenSize: _childSize));
   }
 
   @override
@@ -47,8 +46,10 @@ class _RightPaneState extends State<RightPane> {
     return BlocListener<AppBloc, AppState>(
       listenWhen: (previous, current) => current == AppState.comment,
       listener: (context, state) => _takeScreenshot(),
-      child: BlocBuilder<AppBloc, AppState>(
-        builder: (context, state) {
+      child: Builder(
+        builder: (context) {
+          final state = context.select((AppBloc app) => app.state);
+
           return IgnorePointer(
             ignoring: switch (state) { AppState.comment => true, _ => false },
             child: switch (device) {

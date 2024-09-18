@@ -1,7 +1,6 @@
 import 'package:example/app/route.dart';
 import 'package:example/blog/blog.dart';
 import 'package:example/counter/counter.dart';
-import 'package:example/shared/body.dart';
 import 'package:feedback/feedback.dart';
 import 'package:flutter/material.dart' hide Feedback;
 import 'package:go_router/go_router.dart';
@@ -38,7 +37,7 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return Feedback(
-      projectId: '1ef754b9-c912-6f14-923c-a362fa9fcd02',
+      projectId: '1ef76713-698a-61d4-8018-07d57344ecd9',
       baseUrl: 'http://localhost',
       observer: observer,
       child: MaterialApp.router(
@@ -48,7 +47,6 @@ class _AppState extends State<App> {
           useMaterial3: true,
         ),
         routerConfig: router,
-        builder: (context, child) => PageBody(child: child),
       ),
     );
   }

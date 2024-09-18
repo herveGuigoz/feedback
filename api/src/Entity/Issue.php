@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
@@ -32,8 +33,9 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
     operations: [
         new GetCollection(
             parameters: [
-                'url' => new QueryParameter(required: true, description: 'The URL of the canvas'),
+                'url' => new QueryParameter(required: false, description: 'The URL of the canvas'),
             ],
+            order: ['createdAt' => 'DESC'],
             paginationClientItemsPerPage: true,
         ),
         new Get(
@@ -61,6 +63,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
     ],
 )]
 #[ApiFilter(SearchFilter::class, properties: ['url' => 'exact'])]
+#[ApiFilter(OrderFilter::class, properties: ['createdAt'])]
 #[ORM\Entity(repositoryClass: IssueRepository::class)]
 #[Vich\Uploadable]
 class Issue
@@ -74,7 +77,7 @@ class Issue
     private ?Uuid $id = null;
 
     #[Groups(['read', 'issue:write'])]
-    #[Assert\Url(protocols: ['http', 'https'])]
+    #[Assert\NotBlank(allowNull: false)]
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $url = null;
 
@@ -84,8 +87,18 @@ class Issue
 
     #[Groups(['read', 'issue:write'])]
     #[Assert\NotBlank(allowNull: false)]
-    #[ORM\Column(type: Types::STRING, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: false)]
     private ?string $body = null;
+
+    #[Groups(['read', 'issue:write'])]
+    #[Assert\NotBlank(allowNull: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $device = null;
+
+    #[Groups(['read', 'issue:write'])]
+    #[Assert\NotBlank(allowNull: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $screenSize = null;
 
     #[Groups(['read'])]
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
@@ -112,6 +125,8 @@ class Issue
     #[Groups(['issue:read'])]
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'issue', orphanRemoval: true)]
     private Collection $comments;
+
+
 
     public function __construct()
     {
@@ -155,6 +170,30 @@ class Issue
     public function setBody(string $body): static
     {
         $this->body = $body;
+
+        return $this;
+    }
+
+    public function getScreenSize(): ?string
+    {
+        return $this->screenSize;
+    }
+
+    public function setScreenSize(string $screenSize): static
+    {
+        $this->screenSize = $screenSize;
+
+        return $this;
+    }
+
+    public function getDevice(): ?string
+    {
+        return $this->device;
+    }
+
+    public function setDevice(string $device): static
+    {
+        $this->device = $device;
 
         return $this;
     }
