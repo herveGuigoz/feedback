@@ -1,4 +1,5 @@
-/// A Very Good Project created by Very Good CLI.
+/// Interfaces for a feedback api client.
 library;
 
 export 'src/feedback_client.dart';
+export 'src/models/models.dart';

@@ -11,9 +11,10 @@ command:
     # makes the CI much more stable.
     runPubGetInParallel: false
     environment:
-      sdk: 3.5.2
-      flutter: 3.24.2
-    # dependencies:
+      sdk: 3.10.1
+      flutter: 3.38.3
+    dependencies:
+      rxdart: ^0.27.5
     #   dio: ^5.7.0
     #   equatable: ^2.0.5
     #   firebase_remote_config: ^5.0.4

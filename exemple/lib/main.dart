@@ -3,15 +3,18 @@ import 'dart:io';
 import 'package:example/app/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   HttpOverrides.global = SelfSignedCertificateHttpOverrides();
 
   usePathUrlStrategy();
 
-  runApp(const App());
+  final sharedPreferences = await SharedPreferences.getInstance();
+
+  runApp(App(sharedPreferences: sharedPreferences));
 }
 
 class SelfSignedCertificateHttpOverrides extends HttpOverrides {

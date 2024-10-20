@@ -1,4 +1,8 @@
-# melos_managed_dependency_overrides: feedback
+# melos_managed_dependency_overrides: feedback,feedback_client,feedback_pocketbase
 dependency_overrides:
   feedback:
     path: ../packages/feedback
+  feedback_client:
+    path: ../packages/feedback_client
+  feedback_pocketbase:
+    path: ../packages/feedback_pocketbase
