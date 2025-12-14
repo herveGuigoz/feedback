@@ -47,4 +47,8 @@ class ServerSideEvent extends Stream<RecordSubscriptionEvent> {
   Future<void> _subscribe() async {
     await _pocketBase.collection(collection).subscribe(topic, _controller.add, filter: filter, expand: expands);
   }
+
+  void dispose() {
+    _controller.close();
+  }
 }
