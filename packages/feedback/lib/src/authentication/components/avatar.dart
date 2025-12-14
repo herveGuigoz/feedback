@@ -10,8 +10,6 @@ class Avatar extends StatefulWidget {
     super.key,
   });
 
-  // static DateFormat dateFormat = DateFormat('E, hh:mm a');
-
   final String name;
 
   @override
@@ -19,57 +17,70 @@ class Avatar extends StatefulWidget {
 }
 
 class _AvatarState extends State<Avatar> {
-  final popoverController = ShadPopoverController();
-
-  @override
-  void dispose() {
-    popoverController.dispose();
-    super.dispose();
+  Future<void> _onLogoutTapped() async {
+    final answer = await LogoutDialog.show(context);
+    if ((answer ?? false) && mounted) {
+      context.read<EventBus>().add(const LogoutRequestedEvent());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
 
-    return ShadPopover(
-      controller: popoverController,
-      popover: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: ShadGestureDetector(
-              onTap: () {
-                context.read<EventBus>().add(const LogoutRequestedEvent());
-              },
-              child: const Text('Logout', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-            ),
-          ),
-        ],
-      ),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: ShadGestureDetector(
-          onTap: popoverController.toggle,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                constraints: BoxConstraints.tight(
-                  theme.avatarTheme.size ?? const Size.square(40),
-                ),
-                decoration: ShapeDecoration(shape: const CircleBorder(), color: theme.colorScheme.muted),
-                child: Center(
-                  child: Text(
-                    widget.name.characters.first.toUpperCase(),
-                    style: TextStyle(color: theme.colorScheme.mutedForeground, fontWeight: FontWeight.w400),
-                  ),
+    final username = context.select((AuthenticationBloc auth) => auth.state?.username ?? '');
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: ShadGestureDetector(
+        onTap: _onLogoutTapped,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              constraints: BoxConstraints.tight(
+                theme.avatarTheme.size ?? const Size.square(40),
+              ),
+              decoration: ShapeDecoration(shape: const CircleBorder(), color: theme.colorScheme.muted),
+              child: Center(
+                child: Text(
+                  username.characters.first.toUpperCase(),
+                  style: TextStyle(color: theme.colorScheme.mutedForeground, fontWeight: FontWeight.w400),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class LogoutDialog extends StatelessWidget {
+  const LogoutDialog({super.key});
+
+  static Future<bool?> show(BuildContext context) {
+    return showShadDialog<bool>(context: context, builder: (_) => const LogoutDialog());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ShadDialog.alert(
+      title: const Text('Are you absolutely sure?'),
+      description: const Padding(
+        padding: EdgeInsets.only(bottom: 8),
+        child: Text('This action will log you out of your account.'),
+      ),
+      actions: [
+        ShadButton.outline(
+          child: const Text('Cancel'),
+          onPressed: () => Navigator.of(context).pop(false),
+        ),
+        ShadButton(
+          child: const Text('Continue'),
+          onPressed: () => Navigator.of(context).pop(true),
+        ),
+      ],
     );
   }
 }

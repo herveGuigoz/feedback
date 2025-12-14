@@ -7,6 +7,7 @@ import 'package:feedback/src/feedbacks/components/modals.dart';
 import 'package:feedback/src/feedbacks/item/bloc/feedback_bloc.dart';
 import 'package:feedback/src/shared/bloc/bloc.dart';
 import 'package:feedback/src/shared/components/image.dart';
+import 'package:feedback/src/shared/components/unfocus.dart';
 import 'package:feedback/src/shared/events/events.dart';
 import 'package:feedback/src/shared/models/agent.dart';
 import 'package:feedback_client/feedback_client.dart';
@@ -34,14 +35,16 @@ class EventDetail extends StatelessWidget {
         client: context.read<FeedbackClient>(),
         eventBus: context.read<EventBus>(),
       ),
-      child: Material(
-        color: theme.colorScheme.muted,
-        child: CustomScrollView(
-          slivers: [
-            PinnedHeaderSliver(child: ActionToolbar(onClose: onClose)),
-            const SliverToBoxAdapter(child: EventInformation()),
-            const CommentsListView(),
-          ],
+      child: Unfocus(
+        child: Material(
+          color: theme.colorScheme.muted,
+          child: CustomScrollView(
+            slivers: [
+              PinnedHeaderSliver(child: ActionToolbar(onClose: onClose)),
+              const SliverToBoxAdapter(child: EventInformation()),
+              const CommentsListView(),
+            ],
+          ),
         ),
       ),
     );
@@ -91,7 +94,7 @@ class EventInformation extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
 
-    final (FeedbackEvent event, UserAgent agent, bool canEdit, bool canDelete) = context
+    final (event, agent, canEdit, canDelete) = context
         .select<FeedbackBloc, (FeedbackEvent event, UserAgent agent, bool canEdit, bool canDelete)>(
           (b) => (b.state.feedback, UserAgent(b.state.feedback.agent), b.state.canEdit, b.state.canDelete),
         );
@@ -156,6 +159,7 @@ class EventInformation extends StatelessWidget {
                 'Status',
                 style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
               ),
+              const Gap(4),
               ShadSelect<FeedbackStatus>(
                 enabled: canEdit,
                 minWidth: 200,
@@ -166,7 +170,6 @@ class EventInformation extends StatelessWidget {
                 ],
                 selectedOptionBuilder: (context, option) => Text(option.stringify),
                 onChanged: (value) {
-                  FocusManager.instance.primaryFocus?.unfocus();
                   if (value == null) {
                     return;
                   }

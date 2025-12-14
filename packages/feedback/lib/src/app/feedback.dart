@@ -13,7 +13,12 @@ import 'package:provider/provider.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 class FeedbackApp extends StatefulWidget {
-  const FeedbackApp({required this.client, required this.routeInformationProvider, required this.child, super.key});
+  const FeedbackApp({
+    required this.client,
+    required this.routeInformationProvider,
+    required this.child,
+    super.key,
+  });
 
   final FeedbackClient client;
 
@@ -43,7 +48,10 @@ class FeedbackAppState extends State<FeedbackApp> {
         textDirection: TextDirection.ltr,
         child: Localizations(
           locale: const Locale('en', 'US'),
-          delegates: const [DefaultMaterialLocalizations.delegate, DefaultWidgetsLocalizations.delegate],
+          delegates: const [
+            DefaultMaterialLocalizations.delegate,
+            DefaultWidgetsLocalizations.delegate,
+          ],
           child: Material(
             child: StreamBuilder<User?>(
               stream: widget.client.user,
@@ -59,12 +67,20 @@ class FeedbackAppState extends State<FeedbackApp> {
                         ),
                       ),
                       BlocProvider(
-                        create: (_) =>
-                            AuthenticationBloc(snapshot.data, eventBus: context.read(), client: widget.client),
+                        create: (_) => AuthenticationBloc(
+                          snapshot.data,
+                          eventBus: context.read(),
+                          client: widget.client,
+                        ),
                       ),
-                      BlocProvider(create: (_) => DeviceBloc(eventBus: context.read())),
                       BlocProvider(
-                        create: (context) => FeedbackFormBloc(eventBus: context.read(), client: widget.client),
+                        create: (_) => DeviceBloc(eventBus: context.read()),
+                      ),
+                      BlocProvider(
+                        create: (context) => FeedbackFormBloc(
+                          eventBus: context.read(),
+                          client: widget.client,
+                        ),
                       ),
                       BlocProvider(
                         create: (context) => FeedbacksBloc(

@@ -49,6 +49,13 @@ final class AuthenticationSucceededEvent extends Event {
   List<Object> get props => [user];
 }
 
+/// User failed to log in.
+final class AuthenticationFailedEvent extends Event {
+  const AuthenticationFailedEvent(this.error);
+
+  final Object? error;
+}
+
 /// User is now logged out.
 final class LogoutSucceededEvent extends Event {
   const LogoutSucceededEvent();

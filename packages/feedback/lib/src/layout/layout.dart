@@ -24,10 +24,66 @@ part 'bottom.dart';
 part 'left.dart';
 part 'right.dart';
 
-class FeedbackLayout extends StatelessWidget {
+class FeedbackLayout extends StatefulWidget {
   const FeedbackLayout({required this.child, super.key});
 
   final Widget child;
+
+  @override
+  State<FeedbackLayout> createState() => _FeedbackLayoutState();
+}
+
+class _FeedbackLayoutState extends State<FeedbackLayout> {
+  late EventBus _eventBus;
+
+  StreamSubscription<Event>? _subscription;
+
+  void _subscribe() {
+    _subscription = _eventBus.on<Event>().listen((event) {
+      switch (event) {
+        case AuthenticationSucceededEvent():
+          _onAuthenticationSucceededEvent(event);
+        case AuthenticationFailedEvent():
+          _onAuthenticationFailedEvent(event);
+        default:
+      }
+    });
+  }
+
+  Future<void> _onAuthenticationSucceededEvent(AuthenticationSucceededEvent event) async {
+    if (mounted) {
+      ShadToaster.of(context).show(
+        ShadToast(
+          title: const Text('Welcome back!'),
+          description: Text('You are now logged in as ${event.user.username}.'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _onAuthenticationFailedEvent(AuthenticationFailedEvent event) async {
+    if (mounted) {
+      ShadToaster.of(context).show(
+        const ShadToast.destructive(
+          title: Text('Uh oh! Something went wrong'),
+          description: Text('Failed to log in. Please check your credentials and try again.'),
+        ),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _eventBus = context.read<EventBus>();
+    _subscribe();
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +108,7 @@ class FeedbackLayout extends StatelessWidget {
                   _ => null,
                 },
               ),
-              child: RightPane(child: child),
+              child: RightPane(child: widget.child),
             ),
           ),
         ),

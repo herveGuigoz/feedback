@@ -21,7 +21,7 @@ class _FeedbackFormState extends State<FeedbackForm> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-     final path = context.read<FeedbacksBloc>().state.path;
+    final path = context.read<FeedbacksBloc>().state.path;
     EventBus.of(context).add(SubmitFeedbackEvent(path: path, body: _textController.text.trim()));
   }
 
