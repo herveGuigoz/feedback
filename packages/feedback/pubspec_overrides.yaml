@@ -1,4 +1,0 @@
-# melos_managed_dependency_overrides: feedback_client
-dependency_overrides:
-  feedback_client:
-    path: ../feedback_client
