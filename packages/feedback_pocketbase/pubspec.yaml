@@ -4,8 +4,9 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: 3.9.2
-  flutter: 3.35.4
+  sdk: ^3.7.0
+  flutter: ">=3.0.0"
+
 resolution: workspace
 
 dependencies:
@@ -13,9 +14,9 @@ dependencies:
     path: ../feedback_client
   flutter:
     sdk: flutter
-  http: ^1.2.2
+  http: ^1.6.0
   pocketbase: ^0.18.1
-  rxdart: ^0.27.5
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:
