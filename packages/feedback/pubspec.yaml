@@ -20,7 +20,7 @@ dependencies:
   intl:
   provider: ^6.1.2
   rxdart: ^0.27.5
-  shadcn_ui: ^0.39.9
+  shadcn_ui: ^0.42.0
   stack_trace: ^1.11.1
   web: ^1.0.0
   

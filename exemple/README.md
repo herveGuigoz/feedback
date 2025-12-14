@@ -1,16 +1,29 @@
-# example
+# Feedback Example App
 
-A new Flutter project.
+This is an example application demonstrating how to integrate the `feedback` system into a Flutter app.
 
-## Getting Started
+## Overview
 
-This project is a starting point for a Flutter application.
+This app showcases:
+- Integration of `FeedbackApp` with `GoRouter`.
+- Usage of `FeedbackPocketbase` for the backend.
+- A simple counter and blog page to demonstrate feedback submission from different contexts.
 
-A few resources to get you started if this is your first Flutter project:
+## Setup
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1. **PocketBase**: Ensure you have a running PocketBase instance with the required schema (see `pocketbase/` directory in the root of the repository).
+2. **Configuration**: Update `lib/app/app.dart` with your PocketBase URL and Project ID.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```dart
+late final client = FeedbackPocketbase(
+  baseUrl: 'http://localhost:8080', // Update this
+  projectId: 'your-project-id',     // Update this
+  storage: FeedbackStorage(sharedPreferences: widget.sharedPreferences),
+);
+```
+
+## Running the App
+
+```bash
+flutter run
+```
