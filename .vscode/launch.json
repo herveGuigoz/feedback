@@ -10,6 +10,7 @@
       "type": "dart",
       "program": "${workspaceFolder}/exemple/lib/main.dart",
       "args": [
+        // "--release",
         "--web-port",
         "3000",
         "--web-browser-flag",

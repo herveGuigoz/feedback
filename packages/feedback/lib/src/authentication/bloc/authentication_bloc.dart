@@ -24,15 +24,18 @@ class AuthenticationBloc extends Bloc<AuthenticationState> {
       final user = await _client.authenticate(username: event.username, password: event.password);
       emit(user);
       eventBus.add(AuthenticationSucceededEvent(user: user));
-    } catch (_) {}
+    } catch (error) {
+      eventBus.add(AuthenticationFailedEvent(error));
+    }
   }
 
   Future<void> _onLogoutRequested(LogoutRequestedEvent event) async {
     try {
       await _client.logout();
+    } finally {
       emit(null);
       eventBus.add(const LogoutSucceededEvent());
-    } catch (_) {}
+    }
   }
 
   @override

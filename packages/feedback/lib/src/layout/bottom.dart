@@ -19,13 +19,14 @@ class BottomPane extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Row(
+            spacing: 8,
             children: [
               ViewCommentsButton(),
-              SizedBox(width: 8),
               DevicesButton(),
             ],
           ),
           const Row(
+            spacing: 8,
             children: [
               Text('Browse', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
               SwitchButton(),

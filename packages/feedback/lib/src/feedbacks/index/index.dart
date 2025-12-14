@@ -52,7 +52,9 @@ class _EventsLayoutState extends State<EventsLayout> {
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          EventsList(onEventSelected: (event) => _selectedEvent.value = event),
+          EventsList(
+            onEventSelected: (event) => _selectedEvent.value = event,
+          ),
           ColoredBox(
             color: Colors.grey.shade100,
             child: EventDetail(event: _selectedEvent, onClose: () => _selectedEvent.value = null),
@@ -103,9 +105,21 @@ class EventsList extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
-              subtitle: Text(
-                dateFormat.format(event.created),
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w300, color: Colors.grey),
+              subtitle: Row(
+                children: [
+                  Text(
+                    dateFormat.format(event.created),
+                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w300, color: Colors.grey),
+                  ),
+                ],
+              ),
+              trailing: ShadBadge.raw(
+                variant: switch (event.status) {
+                  FeedbackStatus.pending => ShadBadgeVariant.outline,
+                  FeedbackStatus.inProgress => ShadBadgeVariant.primary,
+                  _ => ShadBadgeVariant.secondary,
+                },
+                child: Text(event.status.name),
               ),
               tileColor: theme.colorScheme.primaryForeground,
               onTap: () => onEventSelected(event),

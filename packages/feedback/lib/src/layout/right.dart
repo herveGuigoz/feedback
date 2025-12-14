@@ -26,8 +26,9 @@ class _RightPaneState extends State<RightPane> {
     final image = await boundary.toImage(pixelRatio: pixelRatio);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     final pngBytes = byteData!.buffer.asUint8List();
-    // ignore: use_build_context_synchronously
-    context.read<EventBus>().add(ScreenshotEvent(image: pngBytes, screenSize: _childSize));
+    if (mounted) {
+      context.read<EventBus>().add(ScreenshotEvent(image: pngBytes, screenSize: _childSize));
+    }
   }
 
   @override
@@ -36,10 +37,7 @@ class _RightPaneState extends State<RightPane> {
 
     final child = Measurer(
       onMeasure: (size, constraints) => setState(() => _childSize = size),
-      child: RepaintBoundary(
-        key: _key,
-        child: widget.child,
-      ),
+      child: RepaintBoundary(key: _key, child: widget.child),
     );
 
     return BlocListener<AppBloc, AppState>(
@@ -50,28 +48,31 @@ class _RightPaneState extends State<RightPane> {
           final state = context.select((AppBloc app) => app.state);
 
           return IgnorePointer(
-            ignoring: switch (state) { AppState.comment => true, _ => false },
+            ignoring: switch (state) {
+              AppState.comment => true,
+              _ => false,
+            },
             child: switch (device) {
               Device.desktop => child,
               _ => ColoredBox(
-                  color: Colors.grey.shade100,
-                  child: Center(
-                    child: SizedBox(
-                      width: device.screenSize.width,
-                      height: device.screenSize.height,
-                      child: MediaQuery(
-                        data: MediaQuery.of(context).copyWith(
-                          size: device.screenSize,
-                          // padding: device.safeAreas,
-                          viewInsets: EdgeInsets.zero,
-                          // viewPadding: device.safeAreas,
-                          devicePixelRatio: device.pixelRatio,
-                        ),
-                        child: child,
+                color: Colors.grey.shade100,
+                child: Center(
+                  child: SizedBox(
+                    width: device.screenSize.width,
+                    height: device.screenSize.height,
+                    child: MediaQuery(
+                      data: MediaQuery.of(context).copyWith(
+                        size: device.screenSize,
+                        // padding: device.safeAreas,
+                        viewInsets: EdgeInsets.zero,
+                        // viewPadding: device.safeAreas,
+                        devicePixelRatio: device.pixelRatio,
                       ),
+                      child: child,
                     ),
                   ),
-                )
+                ),
+              ),
             },
           );
         },
