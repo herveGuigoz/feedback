@@ -44,6 +44,7 @@ class _DevicesButtonState extends State<DevicesButton> {
                 if (value) {
                   context.read<EventBus>().add(DeviceChangedEvent(device));
                 }
+                popoverController.hide();
               },
               label: Text(
                 switch (device) { Device.desktop => 'Desktop', _ => device.name },
