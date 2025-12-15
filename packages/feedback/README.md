@@ -17,7 +17,9 @@ Add this to your `pubspec.yaml`:
 ```yaml
 dependencies:
   feedback:
-    path: packages/feedback
+    git:
+      url: https://github.com/herveGuigoz/feedback.git
+      path: packages/feedback
 ```
 
 ## Usage

@@ -14,7 +14,7 @@ import 'package:rxdart/rxdart.dart';
 /// {@endtemplate}
 class FeedbackPocketbase implements FeedbackClient {
   /// {@macro feedback_pocketbase}
-  FeedbackPocketbase({required this.baseUrl, required this.projectId, required FeedbackStorageInterface storage})
+  FeedbackPocketbase({required this.baseUrl, required this.projectId, FeedbackStorageInterface? storage})
     : _pocketBase = PocketBase(baseUrl, authStore: FeebackAuthStore(storage: storage));
 
   @override
