@@ -15,8 +15,10 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  feedback_pocketbase:
-    path: packages/feedback_pocketbase
+  feedback_pocketbase: 
+    git:
+      url: https://github.com/herveGuigoz/feedback.git
+      path: packages/feedback_pocketbase
 ```
 
 ## Usage
