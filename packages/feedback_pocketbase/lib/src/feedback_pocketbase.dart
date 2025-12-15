@@ -143,12 +143,10 @@ class FeedbackPocketbase implements FeedbackClient {
 }
 
 class FeebackAuthStore extends AuthStore {
-  FeebackAuthStore({required FeedbackStorageInterface storage})
-    : _storage = storage,
-      _user = BehaviorSubject<PocketbaseUser?>.seeded(storage.readUser()) {
-    if (_user.value != null) {
-      super.save(_user.value!.token, _user.value);
-    }
+  FeebackAuthStore({FeedbackStorageInterface? storage})
+    : _storage = storage ?? InMemoryFeedbackStorage(),
+      _user = BehaviorSubject<PocketbaseUser?>() {
+    _storage.readUser().then(_user.add);
   }
 
   final FeedbackStorageInterface _storage;
@@ -175,16 +173,19 @@ class FeebackAuthStore extends AuthStore {
 }
 
 extension on FeedbackStorageInterface {
-  PocketbaseUser? readUser() {
-    final user = read('pocketbase_user');
-    return (user != null) ? PocketbaseUser.fromJson(jsonDecode(user) as Map<String, dynamic>) : null;
+  Future<PocketbaseUser?> readUser() async {
+    final user = await read('pocketbase_user');
+    if (user == null) {
+      return null;
+    }
+    return PocketbaseUser.fromJson(jsonDecode(user) as Map<String, dynamic>);
   }
 
   Future<void> writeUser({required PocketbaseUser user}) async {
     await write(key: 'pocketbase_user', value: jsonEncode(user.toJson()));
   }
 
-  void deleteUser() {
-    delete('pocketbase_user');
+  Future<void> deleteUser() async {
+    await delete('pocketbase_user');
   }
 }

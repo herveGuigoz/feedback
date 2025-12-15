@@ -62,7 +62,7 @@ class FeedbackStorage implements FeedbackStorageInterface {
   final SharedPreferences _sharedPreferences;
 
   @override
-  String? read(String key) => _sharedPreferences.getString(key);
+  Future<String?> read(String key) => Future.value(_sharedPreferences.getString(key));
 
   @override
   Future<void> write({required String key, required String value, Duration? expireIn}) {
