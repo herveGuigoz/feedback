@@ -1,3 +1,4 @@
+import 'package:feedback/src/app/feedback.dart';
 import 'package:feedback/src/authentication/bloc/authentication_bloc.dart';
 import 'package:feedback/src/shared/events/events.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
   static Future<void> show(BuildContext context) async {
-    return showShadDialog(context: context, builder: (_) => const LoginForm());
+    return FeedbackApp.showDialog(context: context, builder: (_) => const LoginForm());
   }
 
   @override
@@ -40,6 +41,7 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Add BlocListener to show error messages on login failure and pop dialog on success
     return ShadDialog(
       title: const Text('Login'),
       description: const Text('Please enter your credentials to login.'),

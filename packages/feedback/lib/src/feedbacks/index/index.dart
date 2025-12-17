@@ -80,52 +80,57 @@ class EventsList extends StatelessWidget {
     final theme = ShadTheme.of(context);
     final state = context.select((FeedbacksBloc bloc) => bloc.state);
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              children: [
-                Text(
-                  state.path,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(width: 8),
-                Expanded(child: Divider(color: Colors.grey.shade300)),
-              ],
-            ),
+    if (state.feedbacks.isEmpty) {
+      return Center(
+        child: SelectableText(
+          'No feedbacks yet.\nBe the first to submit one!',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: theme.colorScheme.mutedForeground,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
-          for (final event in state.feedbacks)
-            ListTile(
-              dense: true,
-              title: Text(
-                event.content,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          maxLines: 2,
+        ),
+      );
+    }
+
+    return ListView.separated(
+      itemCount: state.feedbacks.length,
+      itemBuilder: (context, index) {
+        final event = state.feedbacks[index];
+
+        return ListTile(
+          dense: true,
+          title: Text(
+            event.content,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          subtitle: Row(
+            children: [
+              Text(
+                dateFormat.format(event.created),
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w300, color: Colors.grey),
               ),
-              subtitle: Row(
-                children: [
-                  Text(
-                    dateFormat.format(event.created),
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w300, color: Colors.grey),
-                  ),
-                ],
-              ),
-              trailing: ShadBadge.raw(
-                variant: switch (event.status) {
-                  FeedbackStatus.pending => ShadBadgeVariant.outline,
-                  FeedbackStatus.inProgress => ShadBadgeVariant.primary,
-                  _ => ShadBadgeVariant.secondary,
-                },
-                child: Text(event.status.name),
-              ),
-              tileColor: theme.colorScheme.primaryForeground,
-              onTap: () => onEventSelected(event),
-            ),
-        ],
-      ),
+            ],
+          ),
+          trailing: ShadBadge.raw(
+            variant: switch (event.status) {
+              FeedbackStatus.pending => ShadBadgeVariant.outline,
+              FeedbackStatus.inProgress => ShadBadgeVariant.primary,
+              _ => ShadBadgeVariant.secondary,
+            },
+            child: Text(event.status.name),
+          ),
+          tileColor: theme.colorScheme.primaryForeground,
+          onTap: () => onEventSelected(event),
+        );
+      },
+      separatorBuilder: (context, index) {
+        return ShadSeparator.horizontal(margin: EdgeInsets.zero, color: theme.colorScheme.muted);
+      },
     );
   }
 }

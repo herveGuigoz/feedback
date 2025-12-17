@@ -22,7 +22,7 @@ class _AppState extends State<App> {
   late final client = FeedbackPocketbase(
     baseUrl: 'http://localhost:8080',
     projectId: 'e8s03yzyq9fxgim',
-    storage: FeedbackStorage(sharedPreferences: widget.sharedPreferences),
+    // storage: FeedbackStorage(sharedPreferences: widget.sharedPreferences),
   );
 
   late final router = GoRouter(
