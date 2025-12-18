@@ -29,10 +29,12 @@ class Bloc<T> {
 
   bool get isClosed => _stateController.isClosed;
 
+  @protected
   void on<E extends Event>(FutureOr<void> Function(E event) onEvent) {
     _subscriptions.add(eventBus.on<E>().listen(onEvent));
   }
 
+  @protected
   void emit(T value) {
     if (isClosed) {
       throw StateError('Cannot emit new states after calling close');
@@ -43,6 +45,8 @@ class Bloc<T> {
     _stateController.add(value);
   }
 
+  @protected
+  @mustCallSuper
   Future<void> close() async {
     await _stateController.close();
     for (final subscription in _subscriptions) {

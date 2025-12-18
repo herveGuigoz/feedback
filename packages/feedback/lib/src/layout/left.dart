@@ -18,10 +18,9 @@ class LeftPane extends StatelessWidget {
             border: Border(right: BorderSide(color: theme.colorScheme.border)),
           ),
           child: switch (state) {
-            AppState.disconnected => null,
+            AppState.browse => null,
             AppState.comment => const FeedbackForm(),
             AppState.view => const EventsLayout(),
-            AppState.browse => const SizedBox(),
           },
         ),
       ),

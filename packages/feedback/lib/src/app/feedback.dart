@@ -20,6 +20,12 @@ class FeedbackApp extends StatefulWidget {
     super.key,
   });
 
+  static Future<T?> showDialog<T>({required BuildContext context, required WidgetBuilder builder}) async {
+    final state = context.findAncestorStateOfType<FeedbackAppState>()!;
+
+    return state.showDialog<T>(context: context, builder: builder);
+  }
+
   final FeedbackClient client;
 
   final RouteInformationProvider routeInformationProvider;
@@ -31,6 +37,25 @@ class FeedbackApp extends StatefulWidget {
 }
 
 class FeedbackAppState extends State<FeedbackApp> {
+  final navigatorKey = GlobalKey<NavigatorState>();
+
+  final _eventBus = EventBus();
+
+  final _isDialogOpen = ValueNotifier(false);
+
+  Future<T?> showDialog<T>({required BuildContext context, required WidgetBuilder builder}) async {
+    _isDialogOpen.value = true;
+    T? result;
+
+    try {
+      result = await showShadDialog<T>(context: navigatorKey.currentContext!, builder: builder);
+    } finally {
+      _isDialogOpen.value = false;
+    }
+
+    return result;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -38,77 +63,79 @@ class FeedbackAppState extends State<FeedbackApp> {
   }
 
   @override
+  void dispose() {
+    _eventBus.close();
+    _isDialogOpen.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Add a navigator to show dialogs above the app layout while keeping the child intact.
+    final overlay = ValueListenableBuilder<bool>(
+      valueListenable: _isDialogOpen,
+      builder: (context, value, child) {
+        return IgnorePointer(
+          ignoring: !value,
+          child: Navigator(
+            key: navigatorKey,
+            onGenerateInitialRoutes: (navigator, name) => [MaterialPageRoute(builder: (_) => Container())],
+          ),
+        );
+      },
+    );
+
     return MultiProvider(
       providers: [
+        Provider<EventBus>.value(value: _eventBus),
         Provider<FeedbackClient>.value(value: widget.client),
-        Provider<EventBus>(create: (_) => EventBus()),
       ],
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: Localizations(
-          locale: const Locale('en', 'US'),
-          delegates: const [
-            DefaultMaterialLocalizations.delegate,
-            DefaultWidgetsLocalizations.delegate,
-          ],
-          child: Material(
-            child: StreamBuilder<User?>(
-              stream: widget.client.user,
-              builder: (context, snapshot) {
-                return switch (snapshot.connectionState) {
-                  ConnectionState.none || ConnectionState.waiting => const CircularProgressIndicator.adaptive(),
-                  _ => MultiProvider(
-                    providers: [
-                      BlocProvider(
-                        create: (_) => AppBloc(
-                          snapshot.data != null ? AppState.browse : AppState.disconnected,
-                          eventBus: context.read(),
-                        ),
-                      ),
-                      BlocProvider(
-                        create: (_) => AuthenticationBloc(
-                          snapshot.data,
-                          eventBus: context.read(),
-                          client: widget.client,
-                        ),
-                      ),
-                      BlocProvider(
-                        create: (_) => DeviceBloc(eventBus: context.read()),
-                      ),
-                      BlocProvider(
-                        create: (context) => FeedbackFormBloc(
-                          eventBus: context.read(),
-                          client: widget.client,
-                        ),
-                      ),
-                      BlocProvider(
-                        create: (context) => FeedbacksBloc(
-                          client: widget.client,
-                          eventBus: context.read(),
-                          routeInformationProvider: widget.routeInformationProvider,
-                        ),
-                      ),
-                    ],
-                    child: ShadTheme(
-                      data: ShadThemeData(
-                        brightness: Brightness.light,
-                        colorScheme: const ShadSlateColorScheme.light(),
-                      ),
-                      child: ShadToaster(
-                        child: Navigator(
-                          onGenerateInitialRoutes: (navigator, initialRoute) => [
-                            MaterialPageRoute(builder: (context) => FeedbackLayout(child: widget.child)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                };
+      builder: (context, child) {
+        return MultiProvider(
+          providers: [
+            BlocProvider(
+              create: (_) => AppBloc(eventBus: context.read()),
+            ),
+            BlocProvider(
+              create: (_) => AuthenticationBloc(null, eventBus: context.read(), client: widget.client),
+            ),
+            BlocProvider(
+              create: (_) => DeviceBloc(eventBus: context.read()),
+            ),
+            BlocProvider(
+              create: (context) => FeedbackFormBloc(eventBus: context.read(), client: widget.client),
+            ),
+            BlocProvider(
+              create: (context) {
+                return FeedbacksBloc(
+                  client: widget.client,
+                  eventBus: context.read(),
+                  routeInformationProvider: widget.routeInformationProvider,
+                );
               },
             ),
-          ),
-        ),
+          ],
+          child: child,
+        );
+      },
+      child: ShadApp.custom(
+        appBuilder: (context) {
+          return Directionality(
+            textDirection: TextDirection.ltr,
+            child: ShadAppBuilder(
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: FeedbackLayout(child: widget.child),
+                  ),
+                  Positioned.fill(
+                    child: overlay,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

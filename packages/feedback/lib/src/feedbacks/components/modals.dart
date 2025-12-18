@@ -1,3 +1,4 @@
+import 'package:feedback/src/app/feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
@@ -19,7 +20,7 @@ class InputDialog extends StatefulWidget {
     required Widget description,
     String? initialValue,
   }) {
-    return showShadDialog<String>(
+    return FeedbackApp.showDialog<String>(
       context: context,
       builder: (_) => InputDialog(title: title, description: description, initialValue: initialValue),
     );
@@ -82,7 +83,7 @@ class DeleteDialog extends StatelessWidget {
   const DeleteDialog({super.key});
 
   static Future<bool?> show(BuildContext context) async {
-    return showShadDialog<bool>(context: context, builder: (_) => const DeleteDialog());
+    return FeedbackApp.showDialog<bool>(context: context, builder: (_) => const DeleteDialog());
   }
 
   @override

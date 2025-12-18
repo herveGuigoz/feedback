@@ -4,9 +4,6 @@ part of 'app_bloc.dart';
 /// The state of the app
 /// {@endtemplate}
 enum AppState {
-  /// The user is not logged in
-  disconnected,
-
   /// The user is browsing the app
   browse,
 

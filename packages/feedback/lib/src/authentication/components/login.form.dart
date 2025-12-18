@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:feedback/src/app/feedback.dart';
 import 'package:feedback/src/authentication/bloc/authentication_bloc.dart';
 import 'package:feedback/src/shared/events/events.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +13,7 @@ class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
   static Future<void> show(BuildContext context) async {
-    return showShadDialog(context: context, builder: (_) => const LoginForm());
+    return FeedbackApp.showDialog(context: context, builder: (_) => const LoginForm());
   }
 
   @override
@@ -20,19 +23,58 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<ShadFormState>();
 
+  late EventBus _eventBus;
+
+  StreamSubscription<Event>? _subscription;
+
   final _username = TextEditingController();
 
   final _password = TextEditingController();
 
-  void submitForm() {
-    if (_formKey.currentState!.saveAndValidate()) {
-      context.read<EventBus>().add(AuthenticationRequestedEvent(username: _username.text, password: _password.text));
+  void _subscribe() {
+    _subscription = _eventBus.on<Event>().listen((event) {
+      switch (event) {
+        case AuthenticationSucceededEvent():
+          _onAuthenticationSucceededEvent(event);
+        case AuthenticationFailedEvent():
+          _onAuthenticationFailedEvent(event);
+        default:
+      }
+    });
+  }
+
+  Future<void> _onAuthenticationSucceededEvent(AuthenticationSucceededEvent event) async {
+    if (mounted) {
       Navigator.pop(context);
     }
   }
 
+  Future<void> _onAuthenticationFailedEvent(AuthenticationFailedEvent event) async {
+    if (mounted) {
+      ShadToaster.of(context).show(
+        const ShadToast.destructive(
+          title: Text('Failed to log in. Please check your credentials and try again.'),
+        ),
+      );
+    }
+  }
+
+  void submitForm() {
+    if (_formKey.currentState!.saveAndValidate()) {
+      context.read<EventBus>().add(AuthenticationRequestedEvent(username: _username.text, password: _password.text));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _eventBus = context.read<EventBus>();
+    _subscribe();
+  }
+
   @override
   void dispose() {
+    _subscription?.cancel();
     _username.dispose();
     _password.dispose();
     super.dispose();

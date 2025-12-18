@@ -6,7 +6,6 @@ class BottomPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
-    final user = context.select((AuthenticationBloc auth) => auth.state);
 
     return Container(
       constraints: const BoxConstraints.tightFor(height: 64),
@@ -35,13 +34,7 @@ class BottomPane extends StatelessWidget {
           ),
           ConstrainedBox(
             constraints: const BoxConstraints.tightFor(width: 100),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: switch (user) {
-                User() => Avatar(name: user.username),
-                _ => const LoginButton(),
-              },
-            ),
+            child: const Align(alignment: Alignment.centerRight, child: Avatar()),
           ),
         ],
       ),
@@ -55,11 +48,12 @@ class ViewCommentsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.select((AppBloc app) => app.state);
+    final user = context.select((AuthenticationBloc auth) => auth.state);
 
     return ShadButton.outline(
-      enabled: state != AppState.disconnected,
+      enabled: user != null,
       onPressed: switch (state) {
-        AppState.disconnected || AppState.comment => null,
+        AppState.comment => null,
         AppState.browse => () => EventBus.of(context).add(const ViewRequestedEvent()),
         AppState.view => () => EventBus.of(context).add(const BrowseRequestedEvent()),
       },
@@ -74,16 +68,18 @@ class SwitchButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.select((AppBloc app) => app.state);
+    final user = context.select((AuthenticationBloc auth) => auth.state);
 
     return ShadSwitch(
-      enabled: state != AppState.disconnected,
+      enabled: user != null,
       height: 30,
       width: 50,
       value: state == AppState.comment,
-      onChanged: (value) => switch (value) {
-        true => EventBus.of(context).add(const CommentRequestedEvent()),
-        false => EventBus.of(context).add(const BrowseRequestedEvent()),
-      },
+      onChanged:
+          (value) => switch (value) {
+            true => EventBus.of(context).add(const CommentRequestedEvent()),
+            false => EventBus.of(context).add(const BrowseRequestedEvent()),
+          },
     );
   }
 }
